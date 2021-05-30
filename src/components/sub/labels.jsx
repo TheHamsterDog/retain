@@ -1,0 +1,142 @@
+import React from 'react';
+import MenuIcon from '@material-ui/icons/Menu';
+import EmojiObjectsIcon from '@material-ui/icons/EmojiObjectsOutlined';
+import CheckOutlinedIcon from '@material-ui/icons/CheckOutlined';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
+import DeleteIcon from '@material-ui/icons/Delete';
+import LabelIcon from '@material-ui/icons/Label';
+import Modal from '@material-ui/core/Modal';
+import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
+import ArchiveIcon from '@material-ui/icons/Archive';
+import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
+import EditIcon from '@material-ui/icons/Edit';
+
+const Labels = (props) => {
+    const [state, setState] = React.useState({ current: 0, new: "", forceSituation: false, situation: "mini-", showModal: false, modalCurrent: -1, editModal: -1, list: [{ name: "Notes", Icon: EmojiObjectsIcon }, { name: "Archived", Icon: ArchiveIcon }, { name: "Edit labels", Icon: EditOutlinedIcon }], customLabels: [] })
+    let a = -1;
+    const number = 1;
+    const theme = number === 1 ? "dark-" : "light-";
+
+    return (
+        <div className={theme + "label"} onMouseEnter={() => {
+            console.log(state);
+            if (!state.forceSituation) {
+                setState(state => ({ ...state, situation: "" }))
+            }
+        }} onMouseLeave={() => {
+            console.log(state);
+            if (!state.forceSituation) {
+                setState(state => ({ ...state, situation: "mini-" }))
+            }
+        }}>
+            <Modal open={state.showModal} onClose={() => { setState(state => ({ ...state, showModal: !state.showModal })) }}>
+                <div className={theme + "label-" + state.situation + "modal"}>
+                    <div className={theme + "label-" + state.situation + "modal-container"}>
+                        <h1 className={theme + "label-" + state.situation + "modal-title"}>Edit labels</h1>
+                        <form className={theme + "label-" + state.situation + "modal-form"} onSubmit={(e) => {
+                            e.preventDefault();
+                            if (state.new.length > 0) {
+                                setState(state => ({ ...state, customLabels: [...state.customLabels, { name: state.new, id: state.customLabels.length }], new: "" }))
+                            }
+                        }}>
+                            {state.edit ? <CloseOutlinedIcon onClick={() => setState(state => ({ ...state, edit: false }))} className={theme + "label-" + state.situation + "modal-form-icon"} /> : <AddOutlinedIcon onClick={() => setState(state => ({ ...state, edit: true }))} className={theme + "label-" + state.situation + "modal-form-icon"} />}
+                            <input value={state.new} placeholder="Create a label" onChange={(e) => setState(state => ({ ...state, new: e.target.value }))} onFocus={() => setState(state => ({ ...state, edit: true }))} className={theme + "label-" + state.situation + "modal-form-input"} />
+                            {state.edit ? <CheckOutlinedIcon className={theme + "label-" + state.situation + "modal-form-icon"} onClick={() => {
+                                if (state.new.length > 0) {
+                                    setState(state => ({ ...state, customLabels: [...state.customLabels, { name: state.new, id: state.customLabels.length }], new: "" }))
+                                }
+                            }} /> : <div>&nbsp;</div>}
+                        </form>
+                        <div className={theme + "label-" + state.situation + "modal-labels"}>
+                            {state.customLabels.map(i => {
+                                console.log(i);
+                                if (i === null) {
+                                    return null;
+                                }
+                                return (<div key={i.id} onMouseEnter={() => {
+                                    setState(state => ({ ...state, modalCurrent: i.id }));
+                                }} onMouseLeave={() => {
+                                    setState(state => ({ ...state, modalCurrent: -1 }));
+                                }}
+                                    className={theme + "label-" + state.situation + "list-item "} >
+
+                                    {state.modalCurrent === i.id ? <DeleteIcon onClick={() => setState(state => ({
+                                        ...state, customLabels: state.customLabels.filter(l => {
+                                            if (l.id !== i.id) {
+                                                return l;
+                                            }
+                                        }), modalCurrent: i.id + 1
+                                    }))} className={theme + "label-" + state.situation + "modal-labels-icon-left"} /> : <LabelIcon className={theme + "label-" + state.situation + "modal-labels-icon-left"} />}
+
+                                    {state.editModal === i.id ? <form onSubmit={(e) => {
+                                        e.preventDefault();
+                                        setState(state => ({ ...state, editModal: -1 }));
+                                    }}> <input autoFocus={true} className={theme + "label-" + state.situation + "modal-labels-input"} value={state.customLabels.find(label => label.id === i.id).name} onChange={(e) => setState(state => ({
+                                        ...state, customLabels: state.customLabels.map(label => {
+                                            if (label.id === i.id) {
+                                                return { id: label.id, name: e.target.value }
+                                            }
+                                            else {
+                                                return label;
+                                            }
+                                        })
+                                    }))} /> </form> : <div><p onClick={() => { setState(state => ({ ...state, editModal: i.id })); }} className={theme + "label-" + state.situation + "list-item-name"}>{i.name.length > 17 ? i.name.slice(0, 13) + "..." : i.name}</p></div>}
+
+
+                                    {state.editModal === i.id ? <CheckOutlinedIcon className={theme + "label-" + state.situation + "modal-labels-icon-edit"} style={{ marginTop: "-2rem" }} onClick={() => {
+                                        setState(state => ({ ...state, editModal: -1 }));
+                                    }} /> : <EditIcon className={theme + "label-" + state.situation + "modal-labels-icon-edit"} onClick={() => {
+                                        setState(state => ({ ...state, editModal: i.id }));
+                                    }} />}
+                                </div>)
+
+                            })}
+                        </div>
+                    </div>
+                    <div className={theme + "label-" + state.situation + "modal-close "}>
+                        <button className={theme + "label-" + state.situation + "modal-close-button "} onClick={() => setState(state => ({ ...state, showModal: false }))}>Done</button>
+                    </div>
+                </div>
+            </Modal>
+            <MenuIcon className={theme + "label-" + state.situation + "icon"} onClick={() => {
+                if (!state.forceSituation) {
+                    setState(state => ({ ...state, situation: "", forceSituation: true }))
+                }
+                else {
+                    setState(state => ({ ...state, situation: "mini-", forceSituation: false }))
+                }
+            }} />
+            <div className={theme + "label-" + state.situation + "list"}>
+
+                {state.list.map(i => {
+                    a++;
+                    let key = a;
+                    return (<div key={key} onClick={() => {
+                        if (key === 2) {
+                            setState(state => ({ ...state, current: key, showModal: true }));
+                        }
+                        else {
+                            setState(state => ({ ...state, current: key }));
+                        }
+
+                    }} className={state.current === key ? theme + "label-" + state.situation + "list-item " + theme + "label-" + state.situation + "list-item-current" : theme + "label-" + state.situation + "list-item"}><i.Icon className={theme + "label-" + state.situation + "list-item-icon"} /> <p className={theme + "label-" + state.situation + "list-item-name"}>{i.name}</p></div>)
+                })}
+                {state.customLabels.map(i => {
+                    a++;
+                    let key = a;
+                    return (<div key={key} onClick={() => {
+                        if (key === 2) {
+                            setState(state => ({ ...state, current: key, showModal: true }));
+                        }
+                        else {
+                            setState(state => ({ ...state, current: key }));
+                        }
+
+                    }} className={state.current === key ? theme + "label-" + state.situation + "list-item " + theme + "label-" + state.situation + "list-item-current" : theme + "label-" + state.situation + "list-item"}><LabelOutlinedIcon className={theme + "label-" + state.situation + "list-item-icon"} /> <p className={theme + "label-" + state.situation + "list-item-name"}>{i.name.length > 17 ? i.name.slice(0, 13) + "..." : i.name}</p></div>)
+                })}
+            </div>
+        </div >);
+
+}
+export default Labels;

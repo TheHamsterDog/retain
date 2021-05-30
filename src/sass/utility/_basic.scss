@@ -1,0 +1,30 @@
+body {
+    margin: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &::-webkit-scrollbar {
+
+        background: transparent;
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+
+        background: rgb(#202124, 1);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #6F7072;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: rgb(185, 184, 184);
+    }
+
+}
+
+
+html {
+    font-size: 10px;
+}

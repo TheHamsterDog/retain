@@ -1,0 +1,15 @@
+.dark {
+    &-app {
+        min-height: 100vh;
+        padding-bottom: 20vh;
+        background-color:$colorDarkPrimary;
+    }
+}
+
+.light {
+    &-app {
+        min-height: 100vh;
+        background-color:$colorLightPrimary;
+    }
+
+}
