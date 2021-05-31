@@ -2,17 +2,17 @@ import { StarRateTwoTone } from '@material-ui/icons';
 import React from 'react';
 import CanvasDraw from "react-canvas-draw";
 import { HexColorPicker } from "react-colorful";
-import 'react-color-picker/index.css'
+
 
 const Canvas = (props) => {
     const ref = React.useRef(null);
     const [state, setState] = React.useState({ color: "#452135", size: 0, })
     const sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 30, 40, 50, 60, 100];
     console.log(state);
-    return <div {...props}>
+    return <div {...props} style={{ overflowY: "scroll" }}>
         <div className={props.className + "-editor"}>
             <div className={props.className + "-editor-colorPicker"}>
-                return <HexColorPicker color={state.color} onChange={(e) => setState(state => ({ ...state, color: e }))} />;
+                <HexColorPicker style={{width:"50%"}} color={state.color} onChange={(e) => setState(state => ({ ...state, color: e }))}  />
             </div>
             <div className={props.className + "-editor-size"}>
 
@@ -71,7 +71,7 @@ const Canvas = (props) => {
             </div>
         </div>
         <div className={props.className + "-canvas"}>
-            <CanvasDraw ref={ref} hideGrid={true} hideInterface={true} catenaryColor="transparent" brushRadius={state.size} brushColor={state.color} canvasHeight={600} canvasWidth={1000} />
+            <CanvasDraw ref={ref} hideGrid={true} hideInterface={true} catenaryColor="transparent" brushRadius={state.size} brushColor={state.color} canvasHeight={(window.innerHeight * 80 / 100)} canvasWidth={(window.innerWidth * 50 / 100)} />
         </div>
     </div>
 }
@@ -80,14 +80,14 @@ export const DisabledCanvas = (props) => {
     if (props.type) {
         if (props.type === 'in-note') {
             if (props.length > 1) {
-                return <CanvasDraw hideGrid={true} hideInterface={true} immediateLoading={true} saveData={props.data} disabled={true} catenaryColor="transparent" canvasHeight={68.4} canvasWidth={114.95} />
+                return <CanvasDraw hideGrid={true} hideInterface={true} immediateLoading={true} saveData={props.data} disabled={true} catenaryColor="transparent" canvasHeight={68.4} canvasWidth={68.4} />
             }
             else {
-                return <CanvasDraw hideGrid={true} hideInterface={true} immediateLoading={true} saveData={props.data} disabled={true} catenaryColor="transparent" canvasHeight={81} canvasWidth={135} />
+                return <CanvasDraw hideGrid={true} hideInterface={true} immediateLoading={true} saveData={props.data} disabled={true} catenaryColor="transparent" canvasHeight={81} canvasWidth={81} />
             }
         }
     }
-    return <CanvasDraw hideGrid={true} hideInterface={true} immediateLoading={true} saveData={props.data} disabled={true} catenaryColor="transparent" canvasHeight={162} canvasWidth={270} />
+    return <CanvasDraw hideGrid={true} hideInterface={true} immediateLoading={true} saveData={props.data} disabled={true} catenaryColor="transparent" canvasHeight={162} canvasWidth={162} />
 
 }
 export default Canvas;

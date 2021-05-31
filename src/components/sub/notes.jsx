@@ -23,16 +23,18 @@ import Modal from '@material-ui/core/Modal';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddAlertIcon from '@material-ui/icons/AddAlert';
 import Canvas, { DisabledCanvas } from './canvas';
-
+import Note from './note';
 let i = 1;
-let theme = i === 0 ? "light-" : "dark-";
+
 let notAllowCollapse = false;
 
 const AnotherComponent = (props) => {
-
+    const i = props.themeNumber;
+    let theme = i === 0 ? "light-" : "dark-";
     const state = props.state;
     const setState = props.setState;
-    console.log(state);
+    localStorage.setItem("state", JSON.stringify(state));
+    // console.log(state);
     return (
         <div className={theme + "notes-details"}>
             {state.addingLabel ?
@@ -75,7 +77,7 @@ const AnotherComponent = (props) => {
                                                 </div>
                         <div onClick={() => { setState(state => ({ ...state, addingLabel: false, addingDrawing: true })) }} className={theme + "notes-details-list-item"}>
                             Add Drawing
-                                                </div>
+                        </div>
 
                     </div>
                 </div>}
@@ -85,23 +87,21 @@ const AnotherComponent = (props) => {
 
 }
 const Notes = (props) => {
+    const i = props.themeNumber;
+    let theme = i === 1 ? "dark-" : "light-";
     const colors = ["default", "red", "orange", "yellow", "green", "teal", "blue", "darkBlue", "purple", "pink", "brown", "gray"]
-    const [state, setState] = React.useState({
-        new: { title: "", canvas: [], images: [], list: false, description: "", color: "default", labels: [], pinned: false, archived: false }, showRest: false, pastStates: [{ title: "", set: true, canvas: [], images: [], archived: false, list: false, description: "", color: "default", labels: [], pinned: false }], availableLabels: ["label 1", "Label 2"], current: 0, showDetails: false, addingLabel: false, addingImage: false, addingDrawing: false, labelSearchText: "", notes: [], showNoteDetails: null, addingNoteLabel: null, addingNoteDrawing: null, labelNoteSearchText: "", editingNote: {
-            title: "", canvas: [], images: [], set: false, description: "", color: "default", labels: [], pinned: false, archived: false
-        }, currentHover: null
-    })
+    let state = props.state;
+    let setState = props.setState;
     const ref = useDetectClickOutside({ onTriggered: () => { notAllowCollapse ? notAllowCollapse = false : setState(state => ({ ...state, showRest: false, showDetails: false })) } });
-    const otherRef = useDetectClickOutside({ onTriggered: () => { setState(state => ({ ...state, showDetails: false })) } });
     console.log(state);
     return (
         <div className={theme + "notes"}>
 
-            <Modal open={state.addingDrawing}>
+            <Modal key={1} open={state.addingDrawing}>
                 <Canvas className={theme + "notes-edit-canvas"} setState={setState} state={state} />
             </Modal>
 
-            <Modal open={state.editingNote.set} onClose={() => {
+            <Modal key={2} open={state.editingNote.set} onClose={() => {
 
                 setState(state => ({
                     ...state, notes: state.notes.map(note => {
@@ -141,7 +141,7 @@ const Notes = (props) => {
                                         const pastStates = state.current < state.pastStates.length - 1 ? state.pastStates.slice(0, state.current) : state.pastStates;
                                         setState(state => ({
                                             ...state, editingNote: {
-                                                ...state.editingNote, canvas: state.new.canvas.filter(c => {
+                                                ...state.editingNote, canvas: state.editingNote.canvas.filter(c => {
                                                     console.log("working")
                                                     if (c !== canvas) {
                                                         return c;
@@ -149,7 +149,7 @@ const Notes = (props) => {
 
                                                 })
                                             }, pastStates: [...pastStates, {
-                                                ...state.editingNote, canvas: state.new.canvas.filter(c => {
+                                                ...state.editingNote, canvas: state.editingNote.canvas.filter(c => {
 
                                                     if (c !== canvas) {
                                                         return c;
@@ -165,8 +165,6 @@ const Notes = (props) => {
                             })}
 
                         </div> : null}
-
-
                         {state.editingNote.images.length > 0 ? <div className={theme + "notes-header-div-canvas"}>
                             {state.editingNote.images.map(canvas => {
                                 return <div className={state.editingNote.images.length === 1 ? theme + "notes-header-div-canvas-single" : theme + "notes-header-div-canvas-multiple"}><img style={{ width: "100%" }} src={canvas} />
@@ -458,8 +456,8 @@ const Notes = (props) => {
 
             <div ref={ref} className={theme + "notes-header " + theme + "notes-color-note-" + state.new.color} >
 
-                <div className={theme + "notes-header-div"}>
-                    <div className={theme + "notes-header-div-pin"}>
+                <div className={theme + "notes-header-div"} style={{ transition: "all 0.2s" }}>
+                    <div className={theme + "notes-header-div-pin"} style={{ transition: "all 0.2s" }}>
 
                         {state.showRest ? state.new.pinned ? <BookmarkIcon
                             onClick={() => {
@@ -474,10 +472,10 @@ const Notes = (props) => {
                                 setState(state => ({ ...state, new: { ...state.new, pinned: true }, pastStates: [...pastStates, { ...state.new, pinned: true }] }))
                             }} className={theme + "notes-header-div-pin-icon"} /> : null}
                     </div>
-                    {state.new.canvas.length > 0 ? <div className={theme + "notes-header-div-canvas"}>
+                    {state.new.canvas.length > 0 ? <div className={theme + "notes-header-div-canvas"} style={{ transition: "all 0.2s" }}>
                         {state.new.canvas.map(canvas => {
                             return <div className={state.new.canvas.length === 1 ? theme + "notes-header-div-canvas-single" : theme + "notes-header-div-canvas-multiple"}>< DisabledCanvas length={state.new.canvas.length} data={canvas} />
-                                <div onClick={() => {
+                                <div style={{ transition: "all 0.2s" }} onClick={() => {
                                     const pastStates = state.current < state.pastStates.length - 1 ? state.pastStates.slice(0, state.current) : state.pastStates;
                                     setState(state => ({
                                         ...state, new: {
@@ -549,7 +547,7 @@ const Notes = (props) => {
                         }
 
                     }} />
-                    {state.showRest ? <div><textarea value={state.new.description} placeholder="Take a note..." onInput={(e) => {
+                    {state.showRest ? <div style={{ transition: "all 0.2s" }}><textarea value={state.new.description} placeholder="Take a note..." onInput={(e) => {
                         e.target.style.height = "";
                         e.target.style.height = e.target.scrollHeight + "px";
 
@@ -648,7 +646,7 @@ const Notes = (props) => {
                                     <MoreVertOutlinedIcon className={theme + "notes-icon"} onClick={() => {
                                         setState(state => ({ ...state, showDetails: !state.showDetails, addingLabel: false, addingDrawing: false, addingImage: false }));
                                     }} />
-                                    {state.showDetails ? <AnotherComponent state={state} setState={setState} />
+                                    {state.showDetails ? <AnotherComponent themeNumber={i} state={state} setState={setState} />
 
 
                                         : null
@@ -699,302 +697,55 @@ const Notes = (props) => {
                 </h1>
                 <div className={theme + "notes-notes"}>
                     {state.notes.map(a => {
-                        if (a.pinned && !a.archived) {
-                            return (<div key={a.id}
+                        if (state.filter.search.length > 0 && a.pinned) {
+                            if (
 
-                                onMouseEnter={() => {
-                                    setState(state => ({ ...state, currentHover: a.id }))
-                                }} onMouseLeave={() => { setState(state => ({ ...state, currentHover: null })) }} className={theme + "notes-notes-note-" + a.color + " " + theme + "notes-notes-note"} style={{ position: "relative" }}>
-                                {a.pinned ?
-                                    <BookmarkIcon
-                                        style={{ display: state.currentHover !== a.id ? "none" : "block" }}
+                                (a.title + " " + a.description + " " + a.labels + " " + a.color).toLowerCase().includes(state.filter.search.toLowerCase()) ||
+                                (a.title).toLowerCase().includes(state.filter.search.toLowerCase()) ||
+                                (a.description).includes(state.filter.search.toLowerCase()) ||
+                                (a.labels).includes(state.filter.search.toLowerCase()) ||
+                                (a.color).includes(state.filter.search.toLowerCase())
 
-                                        onClick={() => {
-
-                                            setState(state => ({
-                                                ...state, notes: state.notes.map(note => {
-                                                    if (note.id !== a.id) {
-                                                        return note;
-                                                    }
-                                                    else {
-                                                        return { ...a, pinned: false }
-                                                    }
-                                                })
-                                            }))
-                                        }} className={theme + "notes-notes-note-bookmark"} />
-                                    : <BookmarkBorderIcon
-
-                                        onClick={() => {
-
-                                            setState(state => ({
-                                                ...state, notes: state.notes.map(note => {
-                                                    if (note.id !== a.id) {
-                                                        return note;
-                                                    }
-                                                    else {
-                                                        return { ...a, pinned: true }
-                                                    }
-                                                })
-                                            }))
-                                        }} className={theme + "notes-notes-note-bookmark"} />
+                            ) {
+                                if (state.filter.archived) {
+                                    if (a.pinned && a.archived) {
+                                        return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                    }
+                                }
+                                else {
+                                    if (state.L.current !== "Notes") {
+                                        if (a.labels.includes(state.L.current) && a.pinned) {
+                                            return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                        }
+                                    }
+                                    else {
+                                        if (a.pinned && !a.archived) {
+                                            return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                        }
+                                    }
 
                                 }
-                                {a.canvas.length > 0 ? <div className={theme + "notes-notes-note-canvas"} onClick={() => {
-                                    setState(state => ({ ...state, editingNote: { ...a, set: true } }))
-                                }}>
-                                    {a.canvas.map(canvas => {
-                                        return <div className={a.canvas.length === 1 ? theme + "notes-notes-note-canvas-single" : theme + "notes-notes-note-canvas-multiple"} >< DisabledCanvas type="in-note" length={a.canvas.length} data={canvas} />
-                                            {/* <br/> */}
-                                        </div>
-                                    })}
+                            }
+                        }
+                        else {
+                            if (state.filter.archived) {
+                                if (a.pinned && a.archived) {
+                                    return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                }
+                            }
+                            else {
+                                if (state.L.current !== "Notes") {
+                                    if (a.labels.includes(state.L.current) && a.pinned) {
+                                        return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                    }
+                                }
+                                else {
+                                    if (a.pinned && !a.archived) {
+                                        return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                    }
+                                }
 
-                                </div> : null}
-
-
-                                {a.images.length > 0 ? <div onClick={() => {
-                                    setState(state => ({ ...state, editingNote: { ...a, set: true } }))
-                                }} className={theme + "notes-notes-note-canvas"}>
-                                    {a.images.map(canvas => {
-                                        return <div className={a.images.length === 1 ? theme + "notes-header-div-canvas-single" : theme + "notes-header-div-canvas-multiple"}><img style={{ width: "100%" }} src={canvas} />
-
-                                        </div>
-                                    })}
-
-                                </div> : null}
-                                <div className={theme + "notes-notes-note-title"} onClick={() => {
-                                    setState(state => ({ ...state, editingNote: { ...a, set: true } }))
-                                }}>
-                                    {a.title}
-                                </div>
-                                <div className={theme + "notes-notes-note-description"} onClick={() => {
-                                    setState(state => ({ ...state, editingNote: { ...a, set: true } }))
-                                }}>
-                                    {a.description.length > 3000 ? a.description.slice(0, 2998) + "..." : a.description}
-                                </div>
-                                {a.labels.length > 0 ? <div className={theme + "notes-header-labels"}>{a.labels.map(label => {
-                                    return <div className={theme + "notes-header-labels-label"}><p className={theme + "notes-header-labels-label-text"}>{label}</p>
-                                        <DeleteIcon onClick={() => {
-
-                                            setState(state => ({
-                                                ...state,
-                                                notes: state.notes.map(note => {
-                                                    if (note.id !== a.id) {
-                                                        return note;
-                                                    }
-                                                    else {
-                                                        return {
-                                                            ...note, labels: a.labels.filter(l => {
-                                                                if (l !== label) {
-                                                                    return l
-                                                                }
-                                                            })
-                                                        }
-                                                    }
-                                                })
-                                            }))
-                                        }} className={theme + "notes-header-labels-icon"} />
-                                    </div>
-                                })} </div> : <br />}
-                                <div className={theme + "notes-header-options"} style={{ opacity: state.currentHover !== a.id ? 0 : 1, transition: "0.35s all", marginTop: "-1.7rem", marginBottom: "-1rem" }}>
-                                    <div className={theme + "notes-header-options-option-left"}>
-
-                                        <ColorLensOutlinedIcon className={theme + "notes-icon " + theme + "notes-color-icon"} />
-                                        <input type="file" id={"image-uploader-" + a.id} accept="image/*" onChange={(e) => {
-                                            const fileReader = new FileReader();
-                                            try {
-                                                fileReader.readAsDataURL(e.target.files[0]);
-                                                fileReader.onload = () => {
-
-                                                    setState(state => ({
-                                                        ...state, notes: state.notes.map(note => {
-                                                            console.log(note);
-                                                            console.log(a);
-                                                            if (note.id !== a.id) {
-
-                                                                return note;
-
-                                                            }
-                                                            else {
-                                                                console.log("match: " + note.title + " " + a.title);
-                                                                return { ...note, images: [...note.images, fileReader.result] };
-                                                            }
-                                                        })
-                                                    }))
-                                                }
-                                            } catch (err) {
-                                                console.log(err.message);
-                                            }
-
-                                            console.log(e.target.files)
-                                        }} hidden={true} />
-                                        <label for={"image-uploader-" + a.id}><ImageIcon className={theme + "notes-icon"} /></label>
-
-                                        <div className={theme + "notes-color-palette"}>
-                                            {colors.map(c => {
-                                                return (
-
-                                                    <span className={theme + "notes-color-palette-each"} onClick={() => {
-                                                        setState(state => ({
-                                                            ...state, notes: state.notes.map(note => {
-                                                                if (note.id !== a.id) {
-                                                                    return note
-                                                                }
-                                                                else {
-                                                                    return ({ ...note, color: c })
-                                                                }
-                                                            })
-                                                        }))
-                                                    }}>
-                                                        <span className={theme + "notes-color-palette-each-main " + theme + "notes-color-palette-each-" + c} >
-                                                            &nbsp;
-                                            </span>
-                                                        <p className={theme + "notes-color-palette-each-toolkit"}> {c}</p>
-                                                    </span>
-                                                )
-                                            })}
-                                        </div>
-
-
-                                        {a.archived ? <ArchiveIcon
-                                            onClick={() => {
-                                                setState(state => ({
-                                                    ...state, notes: state.notes.map(note => {
-                                                        if (note.id !== a.id) {
-                                                            return note
-                                                        }
-                                                        else {
-                                                            return ({ ...note, archived: false });
-                                                        }
-                                                    })
-                                                }))
-
-                                            }} className={theme + "notes-icon"}
-                                        /> : <ArchiveOutlinedIcon onClick={() => {
-                                            setState(state => ({
-                                                ...state, notes: state.notes.map(note => {
-                                                    if (note.id !== a.id) {
-                                                        return note
-                                                    }
-                                                    else {
-                                                        return ({ ...note, archived: true });
-                                                    }
-                                                })
-                                            }))
-                                        }} className={theme + "notes-icon"} />}
-                                        <div style={{ display: "inline" }} >
-                                            <MoreVertOutlinedIcon className={theme + "notes-icon"} onClick={() => {
-                                                if (state.showNoteDetails === a.id) {
-                                                    setState(state => ({ ...state, showNoteDetails: null, addingNoteLabel: false, addingNoteDrawing: false, labelNoteSearchText: "" }));
-                                                }
-                                                else {
-                                                    setState(state => ({ ...state, showNoteDetails: a.id }));
-                                                }
-
-                                            }} />
-                                            {state.showNoteDetails === a.id ? <div style={{ position: "absolute", bottom: "0", right: "5rem", zIndex: "100" }}>
-
-                                                <div className={theme + "notes-details"}>
-                                                    {state.addingNoteLabel === a.id ?
-                                                        <div>
-                                                            <h1 className={theme + "notes-details-label-header"} >  Label Note</h1>
-                                                            <div key="a" style={{ position: "relative", padding: "1rem" }}>
-                                                                <input className={theme + "notes-details-label-input"} onChange={(e) => setState(state => ({ ...state, labelNoteSearchText: e.target.value }))} placeholder="Enter label name" />
-                                                                <SearchIcon className={theme + "notes-details-label-input-icon"} />
-                                                            </div>
-                                                            <div key="b" className={theme + "notes-details-label-labels"}>
-                                                                {state.availableLabels.map(label => {
-                                                                    console.log(label)
-                                                                    return <div className={theme + "notes-details-label-labels-label"}> <input checked={a.labels.includes(label)} onChange={(e) => {
-                                                                        if (a.labels.includes(label)) {
-                                                                            setState(state => ({
-                                                                                ...state, notes: state.notes.map(note => {
-                                                                                    if (note.id !== a.id) {
-                                                                                        return note;
-                                                                                    }
-                                                                                    else {
-                                                                                        let labels = note.labels.filter(l => {
-                                                                                            if (l !== label) {
-                                                                                                return l;
-                                                                                            }
-                                                                                        });
-                                                                                        return { ...note, labels };
-                                                                                    }
-                                                                                })
-                                                                            }));
-                                                                        }
-                                                                        else {
-                                                                            setState(state => ({
-                                                                                ...state, notes: state.notes.map(note => {
-                                                                                    if (note.id !== a.id) {
-                                                                                        return note;
-                                                                                    }
-                                                                                    else {
-                                                                                        return { ...note, labels: [...note.labels, label] };
-                                                                                    }
-                                                                                })
-                                                                            }));
-                                                                        }
-                                                                    }} className={theme + "notes-details-label-labels-label-check"} id={"label-" + label} type="checkbox" /><label htmlFor={"label-" + label} className={theme + "notes-details-label-labels-label-font"}  >{label.length < 10 ? label : label.slice(0, 7) + "..."}</label> </div>
-                                                                })}
-                                                            </div>
-                                                            {state.labelNoteSearchText.length > 0 && !state.availableLabels.includes(state.labelNoteSearchText) ? <div className={theme + "notes-details-label-create"}>
-                                                                <AddIcon className={theme + "notes-details-label-create-icon"} />
-                                                                <p className={theme + "notes-details-label-create-text"} onClick={() => {
-                                                                    notAllowCollapse = true;
-                                                                    setState(state => ({ ...state, availableLabels: [...state.availableLabels, state.labelNoteSearchText] }))
-                                                                }}>Create "{state.labelNoteSearchText.length < 10 ? state.labelNoteSearchText : state.labelNoteSearchText.slice(0, 7) + "..."}"</p>
-                                                            </div> : null}
-                                                        </div>
-                                                        :
-
-                                                        <div>
-                                                            <div className={theme + "notes-details-list"}>
-                                                                <div onClick={() => {
-
-                                                                    if (state.addingNoteLabel === a.id) {
-                                                                        setState(state => ({ ...state, addingNoteLabel: false }))
-                                                                    }
-                                                                    else setState(state => ({ ...state, addingNoteLabel: a.id }))
-                                                                }} className={theme + "notes-details-list-item"}>
-                                                                    Change Labels
-                                                             </div>
-                                                                <div onClick={() => { setState(state => ({ ...state, addingLabel: false, addingNoteDrawing: a.id, addingDrawing: true })) }} className={theme + "notes-details-list-item"}>
-                                                                    Add Drawing
-                                                            </div>
-                                                                <div onClick={() => {
-                                                                    setState(state => ({
-                                                                        ...state, notes: state.notes.filter(n => {
-                                                                            if (n.id !== a.id) {
-                                                                                return n;
-                                                                            }
-                                                                        })
-                                                                    }))
-                                                                }} className={theme + "notes-details-list-item"}>
-                                                                    Delete Note
-                                                            </div>
-                                                                <div onClick={() => {
-                                                                    const newId = uuid();
-                                                                    console.log(a.id + " " + newId);
-                                                                    const newNote = { ...a, id: newId };
-                                                                    console.log(newNote);
-                                                                    setState(state => ({
-                                                                        ...state, notes: [...state.notes, newNote]
-                                                                    }))
-                                                                }} className={theme + "notes-details-list-item"}>
-                                                                    Copy Note
-                                                            </div>
-
-
-                                                            </div>
-                                                        </div>}
-                                                </div>
-                                            </div>
-                                                : null
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>)
+                            }
                         }
                     })}
                 </div>
@@ -1006,308 +757,58 @@ const Notes = (props) => {
                 </h1>
                 <div className={theme + "notes-notes"}>
                     {state.notes.map(a => {
-                        if (!a.pinned && !a.archived) {
-                            return (<div key={a.id}
-
-                                onMouseEnter={() => {
-                                    setState(state => ({ ...state, currentHover: a.id }))
-                                }} onMouseLeave={() => { setState(state => ({ ...state, currentHover: null })) }} className={theme + "notes-notes-note-" + a.color + " " + theme + "notes-notes-note"} style={{ position: "relative" }}>
-                                {a.pinned ?
-                                    <BookmarkIcon
-                                        style={{ display: state.currentHover !== a.id ? "none" : "block" }}
 
 
-
-                                        onClick={() => {
-
-                                            setState(state => ({
-                                                ...state, notes: state.notes.map(note => {
-                                                    if (note.id !== a.id) {
-                                                        return note;
-                                                    }
-                                                    else {
-                                                        return { ...a, pinned: false }
-                                                    }
-                                                })
-                                            }))
-                                        }} className={theme + "notes-notes-note-bookmark"} />
-                                    : <BookmarkBorderIcon
-                                        style={{ display: state.currentHover !== a.id ? "none" : "block" }}
-                                        onClick={() => {
-
-                                            setState(state => ({
-                                                ...state, notes: state.notes.map(note => {
-                                                    if (note.id !== a.id) {
-                                                        return note;
-                                                    }
-                                                    else {
-                                                        return { ...a, pinned: true }
-                                                    }
-                                                })
-                                            }))
-                                        }} className={theme + "notes-notes-note-bookmark"} />
+                        if (state.filter.search.length > 0 && !a.pinned) {
+                            if (
+                                (a.title + " " + a.description + " " + a.labels + " " + a.color).toLowerCase().includes(state.filter.search.toLowerCase()) ||
+                                (a.title).toLowerCase().includes(state.filter.search.toLowerCase()) ||
+                                (a.description).includes(state.filter.search.toLowerCase()) ||
+                                (a.labels).includes(state.filter.search.toLowerCase()) ||
+                                (a.color).includes(state.filter.search.toLowerCase())
+                            ) {
+                                if (state.filter.archived) {
+                                    if (a.pinned && a.archived) {
+                                        return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                    }
+                                }
+                                else {
+                                    if (state.L.current !== "Notes") {
+                                        if (a.labels.includes(state.L.current && !a.pinned)) {
+                                            return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                        }
+                                    }
+                                    else {
+                                        if (!a.pinned && !a.archived) {
+                                            return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                        }
+                                    }
 
                                 }
-                                {a.canvas.length > 0 ? <div className={theme + "notes-notes-note-canvas"} onClick={() => {
-                                    setState(state => ({ ...state, editingNote: { ...a, set: true } }))
-                                }}>
-                                    {a.canvas.map(canvas => {
-                                        return <div className={a.canvas.length === 1 ? theme + "notes-notes-note-canvas-single" : theme + "notes-notes-note-canvas-multiple"}>< DisabledCanvas type="in-note" length={a.canvas.length} data={canvas} />
-                                            {/* <br/> */}
-                                        </div>
-                                    })}
-
-                                </div> : null}
-
-
-                                {a.images.length > 0 ? <div className={theme + "notes-notes-note-canvas"} onClick={() => {
-                                    setState(state => ({ ...state, editingNote: { ...a, set: true } }))
-                                }}>
-                                    {a.images.map(canvas => {
-                                        return <div className={a.images.length === 1 ? theme + "notes-header-div-canvas-single" : theme + "notes-header-div-canvas-multiple"}><img style={{ width: "100%" }} src={canvas} />
-
-                                        </div>
-                                    })}
-
-                                </div> : null}
-                                <div className={theme + "notes-notes-note-title"} onClick={() => {
-                                    setState(state => ({ ...state, editingNote: { ...a, set: true } }))
-                                }}>
-                                    {a.title}
-                                </div>
-                                <div className={theme + "notes-notes-note-description"} onClick={() => {
-                                    setState(state => ({ ...state, editingNote: { ...a, set: true } }))
-                                }}>
-                                    {a.description.length > 3000 ? a.description.slice(0, 2998) + "..." : a.description}
-                                </div>
-                                {a.labels.length > 0 ? <div className={theme + "notes-header-labels"}>{a.labels.map(label => {
-                                    return <div className={theme + "notes-header-labels-label"}><p className={theme + "notes-header-labels-label-text"}>{label}</p>
-                                        <DeleteIcon onClick={() => {
-
-                                            setState(state => ({
-                                                ...state,
-                                                notes: state.notes.map(note => {
-                                                    if (note.id !== a.id) {
-                                                        return note;
-                                                    }
-                                                    else {
-                                                        return {
-                                                            ...note, labels: a.labels.filter(l => {
-                                                                if (l !== label) {
-                                                                    return l
-                                                                }
-                                                            })
-                                                        }
-                                                    }
-                                                })
-                                            }))
-                                        }} className={theme + "notes-header-labels-icon"} />
-                                    </div>
-                                })} </div> : <br />}
-                                <div className={theme + "notes-header-options"} style={{ opacity: state.currentHover !== a.id ? 0 : 1, transition: "0.35s all", marginTop: "-1.7rem", marginBottom: "-1rem" }}>
-                                    <div className={theme + "notes-header-options-option-left"}>
-
-                                        <ColorLensOutlinedIcon className={theme + "notes-icon " + theme + "notes-color-icon"} />
-                                        <input type="file" id={"image-uploader-" + a.id} accept="image/*" onChange={(e) => {
-                                            const fileReader = new FileReader();
-                                            try {
-                                                fileReader.readAsDataURL(e.target.files[0]);
-                                                fileReader.onload = () => {
-
-                                                    setState(state => ({
-                                                        ...state, notes: state.notes.map(note => {
-                                                            console.log(note);
-                                                            console.log(a);
-                                                            if (note.id !== a.id) {
-
-                                                                return note;
-
-                                                            }
-                                                            else {
-                                                                console.log("match: " + note.title + " " + a.title);
-                                                                return { ...note, images: [...note.images, fileReader.result] };
-                                                            }
-                                                        })
-                                                    }))
-                                                }
-                                            } catch (err) {
-                                                console.log(err.message);
-                                            }
-
-                                            console.log(e.target.files)
-                                        }} hidden={true} />
-                                        <label for={"image-uploader-" + a.id}><ImageIcon className={theme + "notes-icon"} /></label>
-
-                                        <div className={theme + "notes-color-palette"}>
-                                            {colors.map(c => {
-                                                return (
-
-                                                    <span className={theme + "notes-color-palette-each"} onClick={() => {
-                                                        setState(state => ({
-                                                            ...state, notes: state.notes.map(note => {
-                                                                if (note.id !== a.id) {
-                                                                    return note
-                                                                }
-                                                                else {
-                                                                    return ({ ...note, color: c })
-                                                                }
-                                                            })
-                                                        }))
-                                                    }}>
-                                                        <span className={theme + "notes-color-palette-each-main " + theme + "notes-color-palette-each-" + c} >
-                                                            &nbsp;
-                                            </span>
-                                                        <p className={theme + "notes-color-palette-each-toolkit"}> {c}</p>
-                                                    </span>
-                                                )
-                                            })}
-                                        </div>
-
-
-                                        {a.archived ? <ArchiveIcon
-                                            onClick={() => {
-                                                setState(state => ({
-                                                    ...state, notes: state.notes.map(note => {
-                                                        if (note.id !== a.id) {
-                                                            return note
-                                                        }
-                                                        else {
-                                                            return ({ ...note, archived: false });
-                                                        }
-                                                    })
-                                                }))
-
-                                            }} className={theme + "notes-icon"}
-                                        /> : <ArchiveOutlinedIcon onClick={() => {
-                                            setState(state => ({
-                                                ...state, notes: state.notes.map(note => {
-                                                    if (note.id !== a.id) {
-                                                        return note
-                                                    }
-                                                    else {
-                                                        return ({ ...note, archived: true });
-                                                    }
-                                                })
-                                            }))
-                                        }} className={theme + "notes-icon"} />}
-                                        <div style={{ display: "inline" }} >
-                                            <MoreVertOutlinedIcon className={theme + "notes-icon"} onClick={() => {
-                                                if (state.showNoteDetails === a.id) {
-                                                    setState(state => ({ ...state, showNoteDetails: null, addingNoteLabel: false, addingNoteDrawing: false, labelNoteSearchText: "" }));
-                                                }
-                                                else {
-                                                    setState(state => ({ ...state, showNoteDetails: a.id }));
-                                                }
-
-                                            }} />
-                                            {state.showNoteDetails === a.id ? <div style={{ position: "absolute", bottom: "0", right: "5rem", zIndex: "100" }}>
-
-                                                <div className={theme + "notes-details"}>
-                                                    {state.addingNoteLabel === a.id ?
-                                                        <div>
-                                                            <h1 className={theme + "notes-details-label-header"} >  Label Note</h1>
-                                                            <div key="a" style={{ position: "relative", padding: "1rem" }}>
-                                                                <input className={theme + "notes-details-label-input"} onChange={(e) => setState(state => ({ ...state, labelNoteSearchText: e.target.value }))} placeholder="Enter label name" />
-                                                                <SearchIcon className={theme + "notes-details-label-input-icon"} />
-                                                            </div>
-                                                            <div key="b" className={theme + "notes-details-label-labels"}>
-                                                                {state.availableLabels.map(label => {
-                                                                    console.log(label)
-                                                                    return <div className={theme + "notes-details-label-labels-label"}> <input checked={a.labels.includes(label)} onChange={(e) => {
-                                                                        if (a.labels.includes(label)) {
-                                                                            setState(state => ({
-                                                                                ...state, notes: state.notes.map(note => {
-                                                                                    if (note.id !== a.id) {
-                                                                                        return note;
-                                                                                    }
-                                                                                    else {
-                                                                                        let labels = note.labels.filter(l => {
-                                                                                            if (l !== label) {
-                                                                                                return l;
-                                                                                            }
-                                                                                        });
-                                                                                        return { ...note, labels };
-                                                                                    }
-                                                                                })
-                                                                            }));
-                                                                        }
-                                                                        else {
-
-
-                                                                            setState(state => ({
-                                                                                ...state, notes: state.notes.map(note => {
-                                                                                    if (note.id !== a.id) {
-                                                                                        return note;
-                                                                                    }
-                                                                                    else {
-                                                                                        return { ...note, labels: [...note.labels, label] };
-                                                                                    }
-                                                                                })
-                                                                            }));
-                                                                        }
-                                                                    }} className={theme + "notes-details-label-labels-label-check"} id={"label-" + label} type="checkbox" /><label htmlFor={"label-" + label} className={theme + "notes-details-label-labels-label-font"}  >{label.length < 10 ? label : label.slice(0, 7) + "..."}</label> </div>
-                                                                })}
-                                                            </div>
-                                                            {state.labelNoteSearchText.length > 0 && !state.availableLabels.includes(state.labelNoteSearchText) ? <div className={theme + "notes-details-label-create"}>
-                                                                <AddIcon className={theme + "notes-details-label-create-icon"} />
-                                                                <p className={theme + "notes-details-label-create-text"} onClick={() => {
-                                                                    notAllowCollapse = true;
-                                                                    setState(state => ({ ...state, availableLabels: [...state.availableLabels, state.labelNoteSearchText] }))
-                                                                }}>Create "{state.labelNoteSearchText.length < 10 ? state.labelNoteSearchText : state.labelNoteSearchText.slice(0, 7) + "..."}"</p>
-                                                            </div> : null}
-                                                        </div>
-                                                        :
-
-                                                        <div>
-                                                            <div className={theme + "notes-details-list"}>
-                                                                <div onClick={() => {
-
-                                                                    if (state.addingNoteLabel === a.id) {
-                                                                        setState(state => ({ ...state, addingNoteLabel: false }))
-                                                                    }
-                                                                    else setState(state => ({ ...state, addingNoteLabel: a.id }))
-                                                                }} className={theme + "notes-details-list-item"}>
-                                                                    Change Labels
-                                                             </div>
-                                                                <div onClick={() => { setState(state => ({ ...state, addingLabel: false, addingNoteDrawing: a.id, addingDrawing: true })) }} className={theme + "notes-details-list-item"}>
-                                                                    Add Drawing
-                                                            </div>
-                                                                <div onClick={() => {
-                                                                    setState(state => ({
-                                                                        ...state, notes: state.notes.filter(n => {
-                                                                            if (n.id !== a.id) {
-                                                                                return n;
-                                                                            }
-                                                                        })
-                                                                    }))
-                                                                }} className={theme + "notes-details-list-item"}>
-                                                                    Delete Note
-                                                            </div>
-                                                                <div onClick={() => {
-                                                                    const newId = uuid();
-                                                                    console.log(a.id + " " + newId);
-                                                                    const newNote = { ...a, id: newId };
-                                                                    console.log(newNote);
-                                                                    setState(state => ({
-                                                                        ...state, notes: [...state.notes, newNote]
-                                                                    }))
-                                                                }} className={theme + "notes-details-list-item"}>
-                                                                    Copy Note
-                                                            </div>
-
-
-                                                            </div>
-                                                        </div>}
-                                                </div>
-                                            </div>
-                                                : null
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>)
+                            }
                         }
-                    })}
+                        else {
+                            if (state.filter.archived) {
+                                if (!a.pinned && a.archived) {
+                                    return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                }
+                            }
+                            else {
+                                if (state.L.current !== "Notes") {
+                                    if (a.labels.includes(state.L.current) && !a.pinned) {
+                                        return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                    }
+                                }
+                                else {
+                                    if (!a.pinned && !a.archived) {
+                                        return (<Note a={a} state={state} setState={setState} theme={theme} />)
+                                    }
+                                }
+
+                            }
+                        }
+                    })
+                    }
                 </div>
             </div>
         </div >

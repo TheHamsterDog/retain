@@ -1,6 +1,8 @@
 .dark {
     &-app {
+        overflow-x: hidden;
         min-height: 100vh;
+        margin:0;
         padding-bottom: 20vh;
         background-color:$colorDarkPrimary;
     }
@@ -8,7 +10,10 @@
 
 .light {
     &-app {
+        overflow-x: hidden;
+        margin:0;
         min-height: 100vh;
+        padding-bottom: 20vh;
         background-color:$colorLightPrimary;
     }
 
